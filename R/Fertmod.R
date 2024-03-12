@@ -5,7 +5,7 @@ library(foreach)
 library(doParallel)
 num_cores <- 3
 registerDoParallel(cores = num_cores)
-vec_x <- c(3, 4, 5)
+vec_x <- c(3)
 foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
   ##### PASTE FROM HERE#####################
   ### 1 load packages################################
