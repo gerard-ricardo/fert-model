@@ -54,7 +54,7 @@ foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
   trans_const <- 0.135
   vert_const <- 0.067
   depth_m <- 4
-  (trans_dim <- 46 * down_scale)
+  (trans_dim <- 10 * down_scale)
   long_dim <- as.integer((flow_rate * no_timestep + 60) * down_scale)
   tb <- 0.26
   fe <- 0.0037
