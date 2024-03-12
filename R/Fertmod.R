@@ -31,11 +31,11 @@ foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
   down_scale <- 1 / grid_size
   sub_steps <- 1
   dt <- 1 / sub_steps
-  (no_timestep <- 3000 * sub_steps)
+  (no_timestep <- 500 * sub_steps)
   time <- 1
   polarbody <- 0 * sub_steps
-  (bundlebreak <- 1050 * sub_steps)
-  bundlebreak_sd <- 289 * sub_steps
+  (bundlebreak <- 400 * sub_steps)
+  bundlebreak_sd <- 10 * sub_steps
   bund_probs <- dtruncnorm(1:no_timestep, a = 0, mean = bundlebreak, sd = bundlebreak_sd)
   patch_type <- "patch_bot"
   (int_col_spac <- 1 * down_scale)
