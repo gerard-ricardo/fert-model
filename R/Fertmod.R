@@ -1,4 +1,4 @@
-dir_name <- "2024_01_23_ah_int1_size9_16_25"
+dir_name <- "out_folder"
 dir.create(file.path(getwd(),  dir_name), showWarnings = T)
 new_folder_path <- file.path(getwd(), dir_name)
 library(foreach)
@@ -577,4 +577,3 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
   ggsave(file = paste0("clouds_", 'int_col_spac', int_col_spac,".pdf"), plots1, width = 10, height = 8, path = new_folder_path)
   ggsave(p4, file = paste0("fert_counter_",'int_col_spac', int_col_spac,".pdf"), width = 10, height = 8, path = new_folder_path)
 }
-
