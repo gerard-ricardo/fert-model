@@ -14,4 +14,9 @@ You can install the development version of Fertmod like so:
 This is not a package as of yet. Run the Fertmod.R script
 ```
 
+## Note
+
+This is a 'cleaned script' with some reduced functionality. 
+
+
 
