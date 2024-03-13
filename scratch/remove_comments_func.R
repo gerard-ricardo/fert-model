@@ -19,6 +19,10 @@ process_script_v2 <- function(input_file, output_file) {
 
   # Write the processed content to the output R script
   writeLines(processed_content, output_file)
+
+  # Clear all lines in the input file by writing an empty string
+  writeLines("", input_file)
 }
 
 process_script_v2("./scratch/Fertmod_commented.R", "./R/Fertmod.R")
+
