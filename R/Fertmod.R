@@ -1,14 +1,14 @@
-dir_name <- "2024_01_23_ah_int1_size9_16_25"
-dir.create(file.path(getwd(), dir_name), showWarnings = T)
+dir_name <- "out_folder"
+dir.create(file.path(getwd(),  dir_name), showWarnings = T)
 new_folder_path <- file.path(getwd(), dir_name)
 library(foreach)
 library(doParallel)
 num_cores <- 3
 registerDoParallel(cores = num_cores)
-vec_x <- c(3)
-foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
-  ##### PASTE FROM HERE#####################
-  ### 1 load packages################################
+vec_x <- c(3,4,5)
+foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
+  #####PASTE FROM HERE#####################
+  # load packages -----------------------------------------------------------
   library(abind)
   library(dplyr)
   library(lattice)
@@ -25,6 +25,8 @@ foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
   source("./R/plot_fun1.R")
   source("./R/plot_fun2.R")
   source("./R/dispersal_func5_diff.R")
+  # Input variables -------------------------------------------------------
+  ## space/time parameter
   grid_size <- 1
   cell_vol <- grid_size^3
   cell_vol_uL <- cell_vol * 10^9
@@ -35,18 +37,20 @@ foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
   time <- 1
   polarbody <- 0 * sub_steps
   (bundlebreak <- 400 * sub_steps)
-  bundlebreak_sd <- 10 * sub_steps
+  bundlebreak_sd <- 100 * sub_steps
   bund_probs <- dtruncnorm(1:no_timestep, a = 0, mean = bundlebreak, sd = bundlebreak_sd)
+  ## patch parameters
   patch_type <- "patch_bot"
-  (int_col_spac <- 1 * down_scale)
+  (int_col_spac <- vec_x[i] * down_scale)
   egg_viab <- 0.92
   colony_diam <- 27
   polyp_den <- 80.6
   fecun_zone <- 0.7
   bund_asc <- 0.008 * down_scale / sub_steps
   bund_asc_egg <- 0.0027 / sub_steps
-  no_width <- vec_x[i]
-  no_height <- vec_x[i]
+  patch_density <- 4
+  no_height <- sqrt(patch_density)
+  no_width <- sqrt(patch_density)
   Ks <- 0.27
   flow_rate <- 0.10 * down_scale
   van_K_c <- 0.41
@@ -78,7 +82,7 @@ foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
   col_area <- pi * (colony_diam / 2)^2
   fecund <- col_area * polyp_den * fecun_zone
   ##### choose configuration###
-  config_lst <- config(spemap = spemap, eggmap = eggmap, long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, int_col_spac = int_col_spac, config1 = patch_type, no.height = no_height, no.width = no_width)
+  config_lst <- config(spemap = spemap, eggmap = eggmap, long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, int_col_spac = int_col_spac, config1 = patch_type, benthos = benthos, no.height = no_height, no.width = no_width, patch_density = patch_density)
   spemap <- config_lst$spemap00
   eggmap <- config_lst$eggmap00
   smallmat <- config_lst$smallmat
@@ -116,6 +120,7 @@ foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
   D_Z <- vert_const * depth_m * shear_surf
   ascent_array <- as.integer(seq(1 / bund_asc, no_timestep, 1 / bund_asc)[1:(z_dim - 3)])
   ascent_array_egg <- as.integer(seq(1 / bund_asc_egg, no_timestep, 1 / bund_asc_egg)[1:(z_dim - 3)])[!is.na(as.integer(seq(1 / bund_asc_egg, no_timestep, 1 / bund_asc_egg)[1:(z_dim - 3)]))]
+  # 5 model prep-----------------------------------------------------------------
   spemap3_3 <- spemap3_2 <- spemap3_1 <- spemap3_0 <- spemap3 <- spemap1_3 <- spemap2 <- spemap2_1 <- spemap1_2 <- blank_spemap
   fertmap <- polymap <- embmap <- eggmap3_4 <- eggmap3_3 <- eggmap3_2 <- eggmap3_1 <- eggmap3_0 <- eggmap3 <- eggmap2 <- eggmap1_3 <- eggmap2_1 <- eggmap1_2 <- blank_eggmap
   labels_temp <- c("1", "1_0", "1_1", "1_2", "1_3", "2", "2_0", "2_1", "2_2", "3", "3_0", "3_1", "3_2", "3_3", "3_4")
@@ -142,6 +147,7 @@ foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
   bunds_sep_spe <- tot_spe_bund * bund_probs
   bunds_sep_egg <- tot_egg_bund * bund_probs
   bund_store <- numeric()
+  # 6 Start model -------------------------------------------------------------
   strt <- Sys.time()
   store_output <- T
   while (time <= no_timestep)
@@ -481,7 +487,7 @@ foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
               S0_m3 <- spemap3_3[i, j, k]
               S0 <- S0_m3 / cell_vol_uL
               Bo <- pi * (rnorm(1, egg_rad, egg_rad_sd)^2) * rnorm(1, spe_speed, spe_speed_sd)
-              time_k <- dt
+              time_k <- dx
               xx <- fe * S0 / E0 * (1 - exp(-Bo * E0 * time_k))
               bb <- fe * S0 / E0 * (1 - exp(-Bo * E0 * tb))
               phi_poly <- (1 - exp(-xx) - xx * exp(-xx)) * (1 - exp(-bb))
@@ -526,59 +532,48 @@ foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
   end_time_opt <- Sys.time()
   time_diff <- end_time_opt - strt
   time_diff
-  ##### PASTE TO HERE########################################
+  # 7 Model end - run above ---------------------------------------------------------------
+  load("./Rdata/500t.Rdata")
+  #####PASTE TO HERE########################################
   print(vec_x)
-  print(c("int_col_spac", int_col_spac))
-  print(c("colony_diam", colony_diam))
-  print(c("patch_type", patch_type))
-  print(c("trans_dim", trans_dim))
-  print(c("folder", dir_name))
-  print(c("bundlebreak_sd", bundlebreak_sd))
-  print(c("spe_speed", spe_speed))
-  save.image(file = file.path(path = new_folder_path, paste0("last_run_", "int_col_spac", int_col_spac, ".Rdata")))
-  p0 <- plot_fun1(spemap3_3, surface)
-  p1 <- plot_fun2(eggmap3_4, surface)
+  print(c('int_col_spac', int_col_spac))
+  print(c('colony_diam', colony_diam))
+  print(c('patch_type', patch_type))
+  print(c('trans_dim', trans_dim))
+  print(c('folder', dir_name))
+  print(c('bundlebreak_sd', bundlebreak_sd))
+  print(c('spe_speed', spe_speed))
+  save.image(file = file.path(path = new_folder_path, paste0("last_run_", 'int_col_spac', int_col_spac, ".Rdata")))
+  p0 = plot_fun1(spemap3_3, surface)
+  p1 = plot_fun2(eggmap3_4, surface)
   coul <- colorRampPalette(brewer.pal(8, "Reds"))(25)
-  p2 <- levelplot(log10(t(apply(spemap_temp3_2[[no_timestep]][, , 2], 2, rev)) / 10^6),
-                  col.regions = coul, at = c(0, 1, 2, 3, 3.5, 4, 5, 6), labels = T, cuts = 5,
-                  contour = T, region = T, xlab = "Transverse", ylab = "Longitudinal", main = "Final sperm concentration (log10(sperm/mL))"
+  p2 = levelplot(log10(t(apply(spemap_temp3_2[[no_timestep]][,,2], 2, rev))/10^6), col.regions = coul, at = c(0, 1, 2, 3, 3.5, 4, 5, 6), labels = T, cuts  = 5,
+                 contour = T, region = T,xlab = "Transverse", ylab = "Longitudinal", main = "Final sperm concentration (log10(sperm/mL))")
+  lay <- rbind(c(0,0,1,1,2,2),
+               c(0,0,1,1,2,2),
+               c(0,0,1,1,2,2),
+               c(0,0,1,1,2,2),
+               c(0,0,1,1,2,2),
+               c(0,0,1,1,2,2)
   )
-  lay <- rbind(
-    c(0, 0, 1, 1, 2, 2),
-    c(0, 0, 1, 1, 2, 2),
-    c(0, 0, 1, 1, 2, 2),
-    c(0, 0, 1, 1, 2, 2),
-    c(0, 0, 1, 1, 2, 2),
-    c(0, 0, 1, 1, 2, 2)
-  )
-  gs <- list(p0, p1, p2)
-  plots1 <- grid.arrange(grobs = gs, layout_matrix = lay)
-  #### fert counter####
-  fert_df <- data.frame(time = 1:(no_timestep), fert = fertcounter)
+  gs = list(p0, p1, p2)
+  plots1 = grid.arrange(grobs = gs, layout_matrix = lay)
+  ####fert counter####
+  fert_df = data.frame(time = 1:(no_timestep), fert = fertcounter)
   tail(fert_df)
-  max_fert <- max(fert_df$fert, na.rm = T)
+  max_fert = max(fert_df$fert, na.rm = T)
   filename <- file.path(new_folder_path, paste0("fertcounter_", int_col_spac, ".RData"))
   source("https://raw.githubusercontent.com/gerard-ricardo/data/master/theme_sleek2")
-  p4 <- ggplot() +
-    geom_point(fert_df,
-               mapping = aes(x = time, y = fert), position = position_jitter(width = .00, height = .00),
-               alpha = 0.50, size = 3
-    ) +
-    theme_sleek2()
-  p4 <- p4 + annotate("text",
-                      x = max(fert_df$time, na.rm = T) * 0.3, y = max(fert_df$fert, na.rm = T) * 0.5,
-                      label = paste("Max fert:", round(max_fert * 100, 2), "%"),
-                      hjust = 1, vjust = -1
-  )
-  p4 <- p4 + annotate("text",
-                      x = max(fert_df$time, na.rm = T) * 0.3, y = max(fert_df$fert, na.rm = T) * 0.4,
-                      label = paste("Total embryos:", round(sum(embmap_store[[no_timestep - 1]][, , 2], na.rm = T), 0)),
-                      hjust = 1, vjust = -1
-  )
-  p4 <- p4 + labs(
-    x = expression(Time ~ (s)),
-    y = expression(Cumulative ~ fert. ~ success ~ (prop.))
-  )
-  ggsave(file = paste0("clouds_", "int_col_spac", int_col_spac, ".pdf"), plots1, width = 10, height = 8, path = new_folder_path)
-  ggsave(p4, file = paste0("fert_counter_", "int_col_spac", int_col_spac, ".pdf"), width = 10, height = 8, path = new_folder_path)
+  p4 = ggplot()+geom_point(fert_df, mapping = aes(x = time, y = fert),position = position_jitter(width = .00, height = .00),
+                           alpha = 0.50, size = 3) + theme_sleek2()
+  p4 <- p4 + annotate("text", x = max(fert_df$time, na.rm = T)*0.3, y = max(fert_df$fert, na.rm = T)*0.5,
+                      label = paste("Max fert:", round(max_fert*100, 2), '%' ),
+                      hjust = 1, vjust = -1)
+  p4 <- p4 + annotate("text", x = max(fert_df$time, na.rm = T)*0.3, y = max(fert_df$fert, na.rm = T)*0.4,
+                      label = paste("Total embryos:", round(sum(embmap_store[[no_timestep-1]][,,2], na.rm = T),0) ),
+                      hjust = 1, vjust = -1)
+  p4 = p4 + labs(x=expression(Time~(s)),
+                 y=expression(Cumulative~fert.~success~(prop.)))
+  ggsave(file = paste0("clouds_", 'int_col_spac', int_col_spac,".pdf"), plots1, width = 10, height = 8, path = new_folder_path)
+  ggsave(p4, file = paste0("fert_counter_",'int_col_spac', int_col_spac,".pdf"), width = 10, height = 8, path = new_folder_path)
 }

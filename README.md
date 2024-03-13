@@ -4,22 +4,19 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of Fertmod is to ...
+This model simulates coral fertilisation success
 
 ## Installation
 
 You can install the development version of Fertmod like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+This is not a package as of yet. Run the Fertmod.R script. It is set up for parrallel processing, link 'vec_x' with your parameter of interest. 
 ```
 
-## Example
+## Note
 
-This is a basic example which shows you how to solve a common problem:
+This is a 'cleaned script' with some reduced functionality. 
 
-``` r
-library(Fertmod)
-## basic example code
-```
+
 
