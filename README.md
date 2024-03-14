@@ -9,7 +9,7 @@ This model simulates coral fertilisation success
 ## Installation
 
 
-This is not a package as yet. Run the Fertmod.R script. It is set up for parallel processing, link 'vec_x[i]' with your parameter of interest. 
+This is not a package as yet. Run the Fertmod.R script. It is set up for parallel processing to increase speed; link 'vec_x[i]' with your parameter of interest. 
 
 
 ## Note
