@@ -8,10 +8,8 @@ This model simulates coral fertilisation success
 
 ## Installation
 
-You can install the development version of Fertmod like so:
 
-
-This is not a package as of yet. Run the Fertmod.R script. It is set up for parallel processing, link 'vec_x[i]' with your parameter of interest. 
+This is not a package as yet. Run the Fertmod.R script. It is set up for parallel processing, link 'vec_x[i]' with your parameter of interest. 
 
 
 ## Note

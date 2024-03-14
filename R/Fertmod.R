@@ -1,17 +1,20 @@
 ## Creating a new folder inside the 'sweeps' directory in the current working directory
-dir_name <- "2024_01_23_ah_int1_size9_16_25"
-dir.create(file.path(getwd(),  dir_name), showWarnings = T)
+dir_name <- "./out/2024_01_23_ah_int1_size9_16_25"
+dir.create(file.path(getwd(), dir_name), showWarnings = T)
 new_folder_path <- file.path(getwd(), dir_name)
 library(foreach)
 library(doParallel)
 
+
 ## Set up the parallel backend using doParallel and the number of cores
 num_cores <- 3
 registerDoParallel(cores = num_cores)
-vec_x <- c(3,4)
-foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
+vec_x <- c(3, 4, 5)
+foreach(i = 1:length(vec_x), .combine = "c") %dopar% {
 
-  #####PASTE FROM HERE#####################
+
+  ##### PASTE FROM HERE#####################
+
 
   # load packages -----------------------------------------------------------
   library(abind)
@@ -31,7 +34,9 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
   source("./R/plot_fun2.R")
   source("./R/dispersal_func5_diff.R")
 
+
   # Input variables -------------------------------------------------------
+
 
   ## space/time parameter
   grid_size <- 1
@@ -47,6 +52,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
   bundlebreak_sd <- 100 * sub_steps
   bund_probs <- dtruncnorm(1:no_timestep, a = 0, mean = bundlebreak, sd = bundlebreak_sd)
 
+
   ## patch parameters
   patch_type <- "patch_bot"
   (int_col_spac <- vec_x[i] * down_scale)
@@ -60,6 +66,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
   no_height <- sqrt(patch_density)
   no_width <- sqrt(patch_density)
 
+
   ## physical parameters
   Ks <- 0.27
   flow_rate <- 0.10 * down_scale
@@ -70,6 +77,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
   depth_m <- 4
   (trans_dim <- 10 * down_scale)
   long_dim <- as.integer((flow_rate * no_timestep + 60) * down_scale)
+
 
   ## fertilisation kinetics parameters
   tb <- 0.26
@@ -82,6 +90,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
   eggperb <- 6
   speperb <- 2.1 * 10^6
 
+
   # create grids ------------------------------------------------------------
   dx <- 1 * grid_size
   dy <- 1 * grid_size
@@ -93,9 +102,11 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
   blank_spemap <- boundary_0(x = blank_spemap, z_dim = z_dim)
   eggmap <- spemap <- blank_bo <- blank_unfert <- blank_phi_mono <- embmap <- blank_eggmap <- blank_spemap
 
+
   ## Create a patch and embed in the grid
   col_area <- pi * (colony_diam / 2)^2
   fecund <- col_area * polyp_den * fecun_zone
+
 
   # configuration -----------------------------------------------------------
   config_lst <- config(spemap = spemap, eggmap = eggmap, long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, int_col_spac = int_col_spac, config1 = patch_type, benthos = benthos, no.height = no_height, no.width = no_width, patch_density = patch_density)
@@ -114,10 +125,12 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
             ylab = "Longitudinal", main = "Conc. (cells/m^3)"
   )
 
-  ##adults to bundles###
+
+  ## adults to bundles###
   spemap0 <- spemap * fecund
   eggmap0 <- eggmap * fecund
   p0 <- plot_fun1(spemap0, benthos)
+
 
   ## Advection
   h_s <- rev(0:(z_dim - 3) + 0.5) / down_scale
@@ -130,25 +143,31 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
     as.integer(seq(1 / fr, no_timestep, 1 / fr))
   })
 
+
   ## Sperm sinking
   sperm_sink_cm_h <- 60
   sperm_sink_m_h <- sperm_sink_cm_h / 10
   sperm_sink_m_s <- sperm_sink_m_h / 3600
+
 
   ## Diffusion coefs
   D_L <- long_const * depth_m * shear_surf
   D_T <- trans_const * depth_m * shear_surf
   D_Z <- vert_const * depth_m * shear_surf
 
+
   ## Ascent array bund
   ascent_array <- as.integer(seq(1 / bund_asc, no_timestep, 1 / bund_asc)[1:(z_dim - 3)])
   ascent_array_egg <- as.integer(seq(1 / bund_asc_egg, no_timestep, 1 / bund_asc_egg)[1:(z_dim - 3)])[!is.na(as.integer(seq(1 / bund_asc_egg, no_timestep, 1 / bund_asc_egg)[1:(z_dim - 3)]))]
 
+
   # model prep-----------------------------------------------------------------
+
 
   ## blank maps###
   spemap3_3 <- spemap3_2 <- spemap3_1 <- spemap3_0 <- spemap3 <- spemap1_3 <- spemap2 <- spemap2_1 <- spemap1_2 <- blank_spemap
   fertmap <- polymap <- embmap <- eggmap3_4 <- eggmap3_3 <- eggmap3_2 <- eggmap3_1 <- eggmap3_0 <- eggmap3 <- eggmap2 <- eggmap1_3 <- eggmap2_1 <- eggmap1_2 <- blank_eggmap
+
 
   ## Create 10 empty lists for sperm and egg temp store
   labels_temp <- c("1", "1_0", "1_1", "1_2", "1_3", "2", "2_0", "2_1", "2_2", "3", "3_0", "3_1", "3_2", "3_3", "3_4")
@@ -176,6 +195,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
   bunds_sep_egg <- tot_egg_bund * bund_probs
   bund_store <- numeric()
 
+
   # Start model -------------------------------------------------------------
   strt <- Sys.time()
   store_output <- T
@@ -183,6 +203,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
   {
     spemap1_1 <- spemap1
     eggmap1_1 <- eggmap1
+
 
     ## Advection loop
     spemap1_2a <- blank_spemap
@@ -200,6 +221,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
       }
     }
 
+
     ## reset boundaries to zero
     spemap1_2a[1, , ] <- 0
     spemap1_2a[long_dim, , ] <- 0
@@ -207,6 +229,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
     spemap1_2a[, trans_dim, ] <- 0
     spemap1_2a[, , 1] <- 0
     spemap1_2a[, , z_dim] <- 0
+
 
     ## 1_2 disperse
     spemap1_2b <- blank_spemap
@@ -224,6 +247,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
       }
     }
 
+
     ## no-flux boundary condition for i = 1
     spemap1_2b[2, , ] <- spemap1_2b[2, , ] + spemap1_2b[1, , ]
     spemap1_2b[1, , ] <- 0
@@ -237,6 +261,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
     spemap1_2b[, , 1] <- 0
     spemap1_2b[, , dim(spemap1_2b)[3] - 1] <- spemap1_2b[, , dim(spemap1_2b)[3] - 1] + spemap1_2b[, , dim(spemap1_2b)[3]]
     spemap1_2b[, , dim(spemap1_2b)[3]] <- 0
+
 
     ## Conservation of mass correction
     spemap1_2b <- spemap1_2b * (sum(spemap1_1, na.rm = TRUE) / sum(spemap1_2b, na.rm = TRUE))
@@ -259,6 +284,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
       }
     }
 
+
     ## reset boundaries to zero
     eggmap1_2a[1, , ] <- 0
     eggmap1_2a[long_dim, , ] <- 0
@@ -266,6 +292,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
     eggmap1_2a[, trans_dim, ] <- 0
     eggmap1_2a[, , 1] <- 0
     eggmap1_2a[, , z_dim] <- 0
+
 
     ## disperse (horizontal sperm bundles in 1_1) for each cell and add to previous cell to 1_2
     eggmap1_2b <- blank_spemap
@@ -283,6 +310,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
       }
     }
 
+
     ## no-flux boundary condition for i = 1
     eggmap1_2b[2, , ] <- eggmap1_2b[2, , ] + eggmap1_2b[1, , ]
     eggmap1_2b[1, , ] <- 0
@@ -297,6 +325,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
     eggmap1_2b[, , dim(eggmap1_2b)[3] - 1] <- eggmap1_2b[, , dim(eggmap1_2b)[3] - 1] + eggmap1_2b[, , dim(eggmap1_2b)[3]]
     eggmap1_2b[, , dim(eggmap1_2b)[3]] <- 0
 
+
     ## Conservation of mass correction
     eggmap1_2b <- eggmap1_2b * (sum(spemap1_1, na.rm = TRUE) / sum(eggmap1_2b, na.rm = TRUE))
     if (store_output) {
@@ -304,7 +333,9 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
       eggmap_temp1_2[[time]] <- eggmap1_2b
     }
 
+
     ## 1_3 ascent bund####
+
 
     ## ascent water column sperm bundles at various time points (1_3)
     spemap1_3 <- blank_spemap
@@ -325,6 +356,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
     if (store_output) {
       spemap_temp1_3[[time]] <- spemap1_3
     }
+
 
     ## ascent water column egg bundles at various time points (1_3)
     eggmap1_3 <- blank_eggmap
@@ -354,7 +386,9 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
       eggmap_temp2_1[[time]] <- eggmap2_1
     }
 
-    ##dissociated separated bundles####
+
+    ## dissociated separated bundles####
+
 
     ## Prepare maps for bundle dissociation. Separate popped bundles to map 3s
     spemap3 <- blank_spemap
@@ -371,6 +405,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
       spemap_temp3[[time]] <- spemap3
     }
 
+
     ## Prepare maps for bundle dissociation. Move popped bundles to map 3s
     eggmap3 <- blank_spemap
     tot_bund_eggmap2_1 <- sum(eggmap2_1, na.rm = T)
@@ -385,7 +420,9 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
       eggmap_temp3[[time]] <- eggmap3
     }
 
-    ##popped + existing gametes####
+
+    ## popped + existing gametes####
+
 
     ## dissociation sperm bundles
     spemap3_1 <- spemap3_0
@@ -403,6 +440,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
       eggmap_temp3_0[[time]] <- eggmap3_0
       eggmap_temp3_1[[time]] <- eggmap3_1
     }
+
 
     ## advect
     spemap3_2a <- blank_spemap
@@ -426,6 +464,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
     spemap3_2a[, , 1] <- 0
     spemap3_2a[, , z_dim] <- 0
 
+
     ## 3_2 dispersed gametes####
     spemap3_2b <- blank_spemap
     for (i in 1:(long_dim))
@@ -441,6 +480,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
         }
       }
     }
+
 
     ## no-flux boundary condition for i = 1
     spemap3_2b[2, , ] <- spemap3_2b[2, , ] + spemap3_2b[1, , ]
@@ -460,12 +500,15 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
     }
     spemap3_3 <- spemap3_2b
 
+
     ####
     moving_sperm <- sperm_sink_m_s * spemap3_2b[, , 2]
     spemap3_3[, , 3] <- spemap3_2b[, , 3] + moving_sperm
     spemap3_3[, , 2] <- spemap3_2b[, , 2] - moving_sperm
 
+
     ####
+
 
     ## advection  eggs
     eggmap3_2a <- blank_eggmap
@@ -489,6 +532,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
     eggmap3_2a[, , 1] <- 0
     eggmap3_2a[, , z_dim] <- 0
 
+
     ## dispersion
     eggmap3_2b <- blank_eggmap
     for (i in 1:(long_dim))
@@ -504,6 +548,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
         }
       }
     }
+
 
     ## no-flux boundary condition for i = 1
     eggmap3_2b[2, , ] <- eggmap3_2b[2, , ] + eggmap3_2b[1, , ]
@@ -521,6 +566,7 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
     if (store_output) {
       eggmap_temp3_2[[time]] <- eggmap3_2b
     }
+
 
     ## ascent eggs only####
     eggmap3_3 <- blank_eggmap
@@ -545,7 +591,9 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
       eggmap_temp3_3[[time]] <- eggmap3_3
     }
 
+
     ## 3_4 fert####
+
 
     ## fertilisation section
     eggmap3_4 <- eggmap3_3
@@ -607,49 +655,65 @@ foreach(i = 1:length(vec_x), .combine = 'c') %dopar% {
   time_diff <- end_time_opt - strt
   time_diff
 
+
   # 7 Model end - run above ---------------------------------------------------------------
 
-  #####PASTE TO HERE########################################
-  print(vec_x)
-  print(c('int_col_spac', int_col_spac))
-  print(c('colony_diam', colony_diam))
-  print(c('patch_type', patch_type))
-  print(c('trans_dim', trans_dim))
-  print(c('folder', dir_name))
-  print(c('bundlebreak_sd', bundlebreak_sd))
-  print(c('spe_speed', spe_speed))
-  save.image(file = file.path(path = new_folder_path, paste0("last_run_", 'int_col_spac', int_col_spac, ".Rdata")))
-  p0 = plot_fun1(spemap3_3, surface)
-  p1 = plot_fun2(eggmap3_4, surface)
-  coul <- colorRampPalette(brewer.pal(8, "Reds"))(25)
-  p2 = levelplot(log10(t(apply(spemap_temp3_2[[no_timestep]][,,2], 2, rev))/10^6), col.regions = coul, at = c(0, 1, 2, 3, 3.5, 4, 5, 6), labels = T, cuts  = 5,
-                 contour = T, region = T,xlab = "Transverse", ylab = "Longitudinal", main = "Final sperm concentration (log10(sperm/mL))")
-  lay <- rbind(c(0,0,1,1,2,2),
-               c(0,0,1,1,2,2),
-               c(0,0,1,1,2,2),
-               c(0,0,1,1,2,2),
-               c(0,0,1,1,2,2),
-               c(0,0,1,1,2,2)
-  )
-  gs = list(p0, p1, p2)
-  plots1 = grid.arrange(grobs = gs, layout_matrix = lay)
 
-  ####fert counter####
-  fert_df = data.frame(time = 1:(no_timestep), fert = fertcounter)
+  ##### PASTE TO HERE########################################
+  print(vec_x)
+  print(c("int_col_spac", int_col_spac))
+  print(c("colony_diam", colony_diam))
+  print(c("patch_type", patch_type))
+  print(c("trans_dim", trans_dim))
+  print(c("folder", dir_name))
+  print(c("bundlebreak_sd", bundlebreak_sd))
+  print(c("spe_speed", spe_speed))
+  save.image(file = file.path(path = new_folder_path, paste0("last_run_", "int_col_spac", int_col_spac, ".Rdata")))
+  p0 <- plot_fun1(spemap3_3, surface)
+  p1 <- plot_fun2(eggmap3_4, surface)
+  coul <- colorRampPalette(brewer.pal(8, "Reds"))(25)
+  p2 <- levelplot(log10(t(apply(spemap_temp3_2[[no_timestep]][, , 2], 2, rev)) / 10^6),
+                  col.regions = coul, at = c(0, 1, 2, 3, 3.5, 4, 5, 6), labels = T, cuts = 5,
+                  contour = T, region = T, xlab = "Transverse", ylab = "Longitudinal", main = "Final sperm concentration (log10(sperm/mL))"
+  )
+  lay <- rbind(
+    c(0, 0, 1, 1, 2, 2),
+    c(0, 0, 1, 1, 2, 2),
+    c(0, 0, 1, 1, 2, 2),
+    c(0, 0, 1, 1, 2, 2),
+    c(0, 0, 1, 1, 2, 2),
+    c(0, 0, 1, 1, 2, 2)
+  )
+  gs <- list(p0, p1, p2)
+  plots1 <- grid.arrange(grobs = gs, layout_matrix = lay)
+
+
+  #### fert counter####
+  fert_df <- data.frame(time = 1:(no_timestep), fert = fertcounter)
   tail(fert_df)
-  max_fert = max(fert_df$fert, na.rm = T)
+  max_fert <- max(fert_df$fert, na.rm = T)
   filename <- file.path(new_folder_path, paste0("fertcounter_", int_col_spac, ".RData"))
   source("https://raw.githubusercontent.com/gerard-ricardo/data/master/theme_sleek2")
-  p4 = ggplot()+geom_point(fert_df, mapping = aes(x = time, y = fert),position = position_jitter(width = .00, height = .00),
-                           alpha = 0.50, size = 3) + theme_sleek2()
-  p4 <- p4 + annotate("text", x = max(fert_df$time, na.rm = T)*0.3, y = max(fert_df$fert, na.rm = T)*0.5,
-                      label = paste("Max fert:", round(max_fert*100, 2), '%' ),
-                      hjust = 1, vjust = -1)
-  p4 <- p4 + annotate("text", x = max(fert_df$time, na.rm = T)*0.3, y = max(fert_df$fert, na.rm = T)*0.4,
-                      label = paste("Total embryos:", round(sum(embmap_store[[no_timestep-1]][,,2], na.rm = T),0) ),
-                      hjust = 1, vjust = -1)
-  p4 = p4 + labs(x=expression(Time~(s)),
-                 y=expression(Cumulative~fert.~success~(prop.)))
-  ggsave(file = paste0("clouds_", 'int_col_spac', int_col_spac,".pdf"), plots1, width = 10, height = 8, path = new_folder_path)
-  ggsave(p4, file = paste0("fert_counter_",'int_col_spac', int_col_spac,".pdf"), width = 10, height = 8, path = new_folder_path)
+  p4 <- ggplot() +
+    geom_point(fert_df,
+               mapping = aes(x = time, y = fert), position = position_jitter(width = .00, height = .00),
+               alpha = 0.50, size = 3
+    ) +
+    theme_sleek2()
+  p4 <- p4 + annotate("text",
+                      x = max(fert_df$time, na.rm = T) * 0.3, y = max(fert_df$fert, na.rm = T) * 0.5,
+                      label = paste("Max fert:", round(max_fert * 100, 2), "%"),
+                      hjust = 1, vjust = -1
+  )
+  p4 <- p4 + annotate("text",
+                      x = max(fert_df$time, na.rm = T) * 0.3, y = max(fert_df$fert, na.rm = T) * 0.4,
+                      label = paste("Total embryos:", round(sum(embmap_store[[no_timestep - 1]][, , 2], na.rm = T), 0)),
+                      hjust = 1, vjust = -1
+  )
+  p4 <- p4 + labs(
+    x = expression(Time ~ (s)),
+    y = expression(Cumulative ~ fert. ~ success ~ (prop.))
+  )
+  ggsave(file = paste0("clouds_", "int_col_spac", int_col_spac, ".pdf"), plots1, width = 10, height = 8, path = new_folder_path)
+  ggsave(p4, file = paste0("fert_counter_", "int_col_spac", int_col_spac, ".pdf"), width = 10, height = 8, path = new_folder_path)
 }

@@ -1,3 +1,10 @@
+#input  = './scratch/Fertmod_commented.R'
+#output = "./R/Fertmod.R"
+
+input  = './scratch/config_commented.R'
+output = "./R/config func.R"
+
+
 process_script_v2 <- function(input_file, output_file) {
   content <- readLines(input_file)
   processed_content <- vector("character", length = length(content))
@@ -21,8 +28,7 @@ process_script_v2 <- function(input_file, output_file) {
   # Clear all lines in the input file by writing an empty string
   #writeLines("", input_file)
 }
-process_script_v2("./scratch/Fertmod_commented.R", "./R/Fertmod.R")
-
+process_script_v2(input, output)
 
 add_empty_lines_before_comments <- function(input_file) {
   content <- readLines(input_file)
@@ -46,8 +52,7 @@ add_empty_lines_before_comments <- function(input_file) {
   # Write the processed content back to the input file
   writeLines(processed_content, input_file)
 }
-# Example usage
-add_empty_lines_before_comments('./R/Fertmod.R')
+add_empty_lines_before_comments(output)
 
 clear_file_content <- function(input_file) {
   # Overwrite the file with an empty string, effectively clearing its content
@@ -55,5 +60,5 @@ clear_file_content <- function(input_file) {
 }
 
 # Example usage
-clear_file_content('./scratch/Fertmod_commented.R')
+clear_file_content(input)
 
