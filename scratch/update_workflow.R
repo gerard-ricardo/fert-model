@@ -1,6 +1,6 @@
 
 
-#edit Teo raw_current
-#copy to Bunya intercol
-#copt to Fertmod_commented and run functions
-#push to Github (dont pull to avoid loosing scratch)
+# Copy 1_teontodd_backend.R to '1 Github coral fert model.R'
+# Copy to '1 Github coral fert model.R'
+# Copy to blank_commented.R and run cleaning functions
+# Push to Github (dont pull to avoid loosing scratch)
