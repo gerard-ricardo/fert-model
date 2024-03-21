@@ -1,9 +1,9 @@
-print_output_and_save_plots <- function(int_col_spac, no_timestep, spemap3_3, eggmap3_4, surface, spemap_temp3_2, fertcounter, embmap_store, new_folder_path) {
+print_output_and_save_plots <- function(int_col_spac, no_timestep, spemap3_3, eggmap3_4, surface, spemap_temp3_3, fertcounter, embmap_store, new_folder_path) {
   save.image(file = file.path(path = new_folder_path, paste0("last_run_",  ".Rdata")))
   p0 = plot_fun1(spemap3_3, surface)
   p1 = plot_fun2(eggmap3_4, surface)
   coul <- colorRampPalette(brewer.pal(8, "Reds"))(25)
-  p2 = levelplot(log10(t(apply(spemap_temp3_2[[no_timestep]][,,2], 2, rev))/10^6), col.regions = coul, at = c(0, 1, 2, 3, 3.5, 4, 5, 6), labels = T, cuts  = 5,
+  p2 = levelplot(log10(t(apply(spemap_temp3_3[[no_timestep]][,,2], 2, rev))/10^6), col.regions = coul, at = c(0, 1, 2, 3, 3.5, 4, 5, 6), labels = T, cuts  = 5,
                  contour = T, region = T,xlab = "Transverse", ylab = "Longitudinal", main = "Final sperm concentration (log10(sperm/mL))")
   lay <- rbind(c(0,0,1,1,2,2),
                c(0,0,1,1,2,2),

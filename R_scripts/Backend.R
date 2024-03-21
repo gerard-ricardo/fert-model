@@ -1,4 +1,4 @@
-run_model <- function(scenario = "default", debug = FALSE, store = FALSE, out = "last_run") {
+run_model <- function(scenario = "default", debug = F, store = F, out = "last_run") {
   dir_name <- paste0("./out/", format(Sys.time(), "%Y_%m_%d_%H%M%S"), "_", out)
   dir.create(file.path(getwd(), dir_name), recursive = TRUE, showWarnings = TRUE)
   new_folder_path <- file.path(getwd(), dir_name)

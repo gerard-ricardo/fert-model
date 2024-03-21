@@ -11,7 +11,10 @@
 # These scripts define the model settings and the backend logic.
 
 source("./R_scripts/settings.R")           # Model settings
-source("./R_scripts/1_teontodd_backend.R") # Model backend logic
+source("./R_scripts/1_print_outputs.R") # Model outputs
+source("./R_scripts/Backend.R") # Model backend logic
+
+
 
 # ============================================================================
 # Choose a Scenario
@@ -19,7 +22,7 @@ source("./R_scripts/1_teontodd_backend.R") # Model backend logic
 # There are three predefined scenarios: 'default', 'test', and 'custom'.
 # - The 'default' scenario uses a spacing of 2m between 9 total colonies, arranged in a square.
 # - The 'test' scenario is similar but with reduced time parameters for quicker runs.
-#   Note: The grid size relative to no_timesteps decreases computational time significantly.
+#   Note: The grid size is relative to no_timesteps, so fewer no_timesteps decreases computational time significantly.
 # - The 'custom' settings can be adjusted through the Shiny app for more granular control.
 #   To customize settings, run the Shiny app script and use the UI to adjust your preferences.
 #   Alternatively, you can manually edit the 'settings_custom' within 'settings.R' and save.
