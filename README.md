@@ -30,6 +30,8 @@ Users can select from predefined scenarios or customize settings via a provided 
     run_model(scenario = "test")
    
    ```
+3. **Outputs** will be in the out folder
+
 
 ## Note
 
