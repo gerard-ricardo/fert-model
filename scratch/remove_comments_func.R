@@ -1,8 +1,11 @@
-input  = "./scratch/Fertmod_commented.R"
-output = "./R_scripts/Backend.R"
+# input  = "./scratch/blank_commented.R"
+# output = "./R_scripts/Backend.R"
+#
+# input  = './scratch/config_commented.R'
+# output = "./R_scripts/config func.R"
 
-#input  = './scratch/config_commented.R'
-#output = "./R_scripts/config func.R"
+input  = "./scratch/blank_commented.R"
+output = "./R_scripts/1_print_outputs.R"
 
 
 process_script_v2 <- function(input_file, output_file) {
