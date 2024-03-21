@@ -29,7 +29,7 @@ Users can select from predefined scenarios or customize settings via a provided 
    # Available options: 'default', 'test', 'custom'.
     run_model(scenario = "test")
    
-   ```r
+   ```
 
 ## Note
 
