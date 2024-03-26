@@ -41,3 +41,5 @@ This is a 'cleaned script' with reduced functionality.
 
 
 
+![Screenshot of Shiny App](https://raw.githubusercontent.com/gerard-ricardo/fert-model/main/scratch/Screenshot%202024-03-27%20092933.png
+)
