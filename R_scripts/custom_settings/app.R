@@ -94,10 +94,16 @@ library(shiny)
 ui <- fluidPage(
   tags$head(
     tags$style(HTML("
-      .time-parameters { background-color: #ADD8E6; padding: 20px; border-radius: 5px; margin-bottom: 20px;}
-      .patch-parameters { background-color: #90EE90; padding: 20px; border-radius: 5px; margin-bottom: 20px;}
-      .flow-parameters { background-color: #FF9999; padding: 20px; border-radius: 5px; margin-bottom: 20px;}
-      .kinetics-parameters { background-color: #9B59B6; padding: 20px; border-radius: 5px; margin-bottom: 20px;}
+      body {
+        background-image: url('https://raw.githubusercontent.com/gerard-ricardo/fert-model/main/scratch/PA190103.jpg'); /* Set the background image */
+        background-size: cover; /* Cover the entire page */
+        background-position: center center; /* Center the background image */
+        background-attachment: fixed; /* Fix the background image position */
+      }
+      .time-parameters { background-color: #ADD8E6; padding: 20px; border-radius: 5px; margin-bottom: 20px; opacity: 0.9; }
+      .patch-parameters { background-color: #90EE90; padding: 20px; border-radius: 5px; margin-bottom: 20px; opacity: 0.9; }
+      .flow-parameters { background-color: #FF9999; padding: 20px; border-radius: 5px; margin-bottom: 20px; opacity: 0.9; }
+      .kinetics-parameters { background-color: #9B59B6; padding: 20px; border-radius: 5px; margin-bottom: 20px; opacity: 0.9; }
       .parameter-heading { font-weight: bold; color: #FFFFFF; }
       .shiny-input-container { width: 100%; }
     "))
