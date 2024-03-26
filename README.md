@@ -17,9 +17,11 @@ Users can select from predefined scenarios or customize settings via a provided 
 
 ### Running the Simulation
 
-1. **Clone or download the repository** to your local machine.
+1. **Download the repository** to your local machine.
 
-2. **Source the required scripts** in your R environment:
+2. **Open Front_end.R script**
+
+3. **Source the required scripts** in your R environment:
 
    ```r
    source("./R_scripts/settings.R")
@@ -30,7 +32,7 @@ Users can select from predefined scenarios or customize settings via a provided 
     run_model(scenario = "test")
    
    ```
-3. **Outputs** will be in the out folder
+4. **Outputs** will be in the out folder
 
 
 ## Note

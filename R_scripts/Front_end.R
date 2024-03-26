@@ -25,7 +25,7 @@ source("./R_scripts/Backend.R") # Model backend logic
 #   Note: The grid size is relative to no_timesteps, so fewer no_timesteps decreases computational time significantly.
 # - The 'custom' settings can be adjusted through the Shiny app for more granular control.
 #   To customize settings, run the Shiny app script and use the UI to adjust your preferences.
-#   Alternatively, you can manually edit the 'settings_custom' within 'settings.R' and save.
+#   Alternatively, you can manually edit the 'settings_custom' within 'settings.R' and save (but you will loose these defaults).
 
 # ============================================================================
 # Run the Model

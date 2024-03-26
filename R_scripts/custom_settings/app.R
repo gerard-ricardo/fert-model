@@ -107,11 +107,11 @@ ui <- fluidPage(
     sidebarPanel(
       class = "wide-sidebar",
       selectInput("patch_type", "Patch Type:",
-                  choices = c("2022ahyac", "2021tenuis", "2021digit"), selected = "2021digit"),
+                  choices = c("2022ahyac", "2021tenuis", "2021digit"), selected = "2022ahyac"),
 
       div(class = "time-parameters",
           h4("Time Parameters", class = "parameter-heading"),
-          numericInput("no_timestep", "Number of Timesteps:", value = 3000),
+          numericInput("no_timestep", "Number of Timesteps:", value = 500),
           numericInput("time", "Time:", value = 1),
           numericInput("polarbody", "Polar Body:", value = 0),
           numericInput("bundlebreak", "Bundle Break:", value = 400),
