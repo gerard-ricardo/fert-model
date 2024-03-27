@@ -33,7 +33,7 @@ source("./R_scripts/Backend.R") # Model backend logic
 # Execute the model using one of the scenarios. Replace "test" with your chosen scenario.
 # Available options: 'default', 'test', 'custom'.
 
-run_model(scenario = "test")  # Choose 'default', 'test', or 'custom'.
+run_model(scenario = "custom")  # Choose 'default', 'test', or 'custom'.
 
 # ============================================================================
 # Note:

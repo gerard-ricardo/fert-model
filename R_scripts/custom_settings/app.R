@@ -113,8 +113,8 @@ ui <- fluidPage(
     sidebarPanel(
       class = "wide-sidebar",
       selectInput("patch_type", "Patch Type:",
-                  choices = c("2022ahyac", "2021tenuis", "2021digit"), selected = "2022ahyac"),
-
+                  choices = c("2022ahyac", "2021tenuis", "2021digit", "patch_bot"), selected = "patch_bot"),
+      uiOutput("interColSpaceMessage"),
       div(class = "time-parameters",
           h4("Time Parameters", class = "parameter-heading"),
           numericInput("no_timestep", "Number of Timesteps:", value = 500),
@@ -174,6 +174,13 @@ ui <- fluidPage(
 
 # Server logic
 server <- function(input, output, session) {
+  output$interColSpaceMessage <- renderUI({
+    if (input$patch_type %in% c("2022ahyac", "2021tenuis", "2021digit")) {
+      return(tags$div(style = "color: red;", "Inter-Colony Space cannot be altered for this patch configuration."))
+    } else {
+      return(NULL)  # No message for other patch types
+    }
+  })
   observeEvent(input$updateSettings, {
     # Update settings_custom with the input values
     settings_custom <<- list(
