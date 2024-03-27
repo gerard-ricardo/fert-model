@@ -176,7 +176,7 @@ ui <- fluidPage(
 server <- function(input, output, session) {
   output$interColSpaceMessage <- renderUI({
     if (input$patch_type %in% c("2022ahyac", "2021tenuis", "2021digit")) {
-      return(tags$div(style = "color: red;", "Inter-Colony Space cannot be altered for this patch configuration."))
+      return(tags$div(style = "color: red;", "Inter-Colony Space or Patch Density cannot be altered for this patch configuration."))
     } else {
       return(NULL)  # No message for other patch types
     }
