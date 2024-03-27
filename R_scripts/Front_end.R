@@ -24,8 +24,8 @@ source("./R_scripts/Backend.R") # Model backend logic
 # - The 'test' scenario is similar but with reduced time parameters for quicker runs.
 #   Note: The grid size is relative to no_timesteps, so fewer no_timesteps decreases computational time significantly.
 # - The 'custom' settings can be adjusted through the Shiny app for more granular control.
-#   To customize settings, run the Shiny app script and use the UI to adjust your preferences. Use patch_type = "patch_bot" to allow
-#   change in the patch spacing and density.
+#   To customize settings, run the Shiny app script within the 'inst' folder and use the UI to adjust your preferences.
+#   Use patch_type = "patch_bot" to allow changes in the patch spacing and density.
 #   Alternatively, you can manually edit the 'settings_custom' within 'settings.R' and save.
 
 # ============================================================================
