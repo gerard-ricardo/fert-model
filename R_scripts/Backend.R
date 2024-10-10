@@ -1,16 +1,31 @@
-run_model <- function(scenario = "default", debug = F, store = F, out = "last_run") {
-  dir_name <- paste0("./out/", format(Sys.time(), "%Y_%m_%d_%H%M%S"), "_", out)
-  dir.create(file.path(getwd(), dir_name), recursive = TRUE, showWarnings = TRUE)
-  new_folder_path <- file.path(getwd(), dir_name)
+##notes
+run_model <- function(scenario = "test", debug = F, store = F, input1 = input1, input_df = input_df, matrix_input = matrix_input, execution_mode = 'single',
+                      colony_diam = NULL, patch_type = NULL, depth_m = NULL, flow_rate = NULL, int_col_spac = NULL, den_cell = NULL,
+                      no_height = NULL, no_width = NULL, tb = NULL, fe = NULL, E0 = NULL, patch_density = NULL,
+                      long_const  = NULL, bundlebreak = NULL, bundlebreak_sd = NULL, spe_speed = NULL, polyp_den = NULL, egg_dia = NULL) {
   if(scenario == "default") {
     params <- settings_default
   } else if(scenario == "test") {
     params <- settings_test
-  } else if(scenario == "custom") {
-    params <- settings_custom
   } else {
     stop("Invalid scenario. Choose 'default', 'test', or provide custom settings.")
   }
+  if (!is.null(int_col_spac)) params$int_col_spac <- int_col_spac
+  if (!is.null(depth_m)) params$depth_m <- depth_m
+  if (!is.null(colony_diam)) params$colony_diam <- colony_diam
+  if (!is.null(patch_type)) params$patch_type <- patch_type
+  if (!is.null(flow_rate)) params$flow_rate <- flow_rate
+  if (!is.null(den_cell)) params$den_cell <- den_cell
+  if (!is.null(tb)) params$tb <- tb
+  if (!is.null(fe)) params$fe <- fe
+  if (!is.null(E0)) params$E0 <- E0
+  if (!is.null(patch_density)) params$patch_density <- patch_density
+  if (!is.null(long_const)) params$long_const <- long_const
+  if (!is.null(bundlebreak)) params$bundlebreak <- bundlebreak
+  if (!is.null(bundlebreak_sd)) params$bundlebreak_sd <- bundlebreak_sd
+  if (!is.null(spe_speed)) params$spe_speed <- spe_speed
+  if (!is.null(polyp_den)) params$polyp_den <- polyp_den
+  if (!is.null(egg_dia)) params$egg_dia <- egg_dia
 
   # load packages -----------------------------------------------------------
   library(abind)
@@ -20,8 +35,6 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
   library(ggplot2)
   library(RColorBrewer)
   library(truncnorm)
-  library(profvis)
-  library(Rcpp)
   source("./R_scripts/boundary_0_func.R")
   source("./R_scripts/config_func.R")
   source("./R_scripts/plot_fun1.R")
@@ -47,6 +60,7 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
   bund_asc <- params$bund_asc
   bund_asc_egg <- params$bund_asc_egg
   patch_density <- params$patch_density
+  den_cell <- params$den_cell
 
   ## physical parameters
   Ks <- params$Ks
@@ -68,6 +82,14 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
   egg_dia_sd <- params$egg_dia_sd
   eggperb <- params$eggperb
   speperb <- params$speperb
+
+  ## prints
+  print(paste("Patch type:", patch_type))
+  print(paste("Scenario:", scenario))
+  print(paste("Depth (m):", depth_m))
+  print(paste("Colony diameter (cm):", colony_diam))
+  print(paste("Inter-colonial spacing (cm):", int_col_spac))
+  print(paste("Density per index cell:", den_cell))
 
   # calculations ------------------------------------------------------------
 
@@ -113,22 +135,26 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
 
   # configuration -----------------------------------------------------------
 
-  #########################################
+  ###
 
-  ####################
+  ###
   config_lst <- config(spemap = spemap, eggmap = eggmap, long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, int_col_spac = int_col_spac,
                        config1 = patch_type, benthos = benthos, no_height = no_height, no_width = no_width, patch_density = patch_density,
-                       colony_diam = colony_diam, fecun_zone = fecun_zone, polyp_den = polyp_den)
+                       colony_diam = colony_diam, fecun_zone = fecun_zone, polyp_den = polyp_den, matrix_input = matrix_input, den_cell = den_cell)
   spemap0 <- config_lst$spemap00
   eggmap0 <- config_lst$eggmap00
-
-  ##############
   smallmat <- config_lst$smallmat
-  sum(smallmat)
   spe_config <- config_lst$plot1
   egg_config <- config_lst$plot2
   plot_fun1(spemap0, benthos)
   plot_fun2(eggmap0, benthos)
+
+  ####
+  coul <- colorRampPalette(brewer.pal(8, "Reds"))(25)
+  levelplot(t(apply(spemap0[,,benthos], 2, rev)),
+            col.regions = coul, xlab = "Transverse",
+            ylab = "Longitudinal", main = "Conc. (cells/m^3)"
+  )
 
   ##adults to bundles####this is now in config
 
@@ -233,14 +259,13 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
         for (k in 1:(z_dim))
         {
           if (is.na(spemap1_2a[i, j, k]) == FALSE) {
-            dispdata <- dispersal5_diff(x = spemap1_2a, i = i, j = j, k = k, dx = dx, dy = dy, dz = dz, dt = dt, D_L = D_L, D_T = D_T, D_Z = D_Z, shear_surf = shear_surf, long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, buoyant = TRUE)
+            dispdata <- dispersal5_diff(x = spemap1_2a, i = i, j = j, k = k, dx = dx, dy = dy, dz = dz, dt = dt, D_L = D_L, D_T = D_T, D_Z = D_Z,
+                                        long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, buoyant = TRUE)
             spemap1_2b[i, j, k] <- spemap1_2a[i, j, k] + dispdata
           }
         }
       }
     }
-
-    ## no-flux boundary condition for i = 1
     spemap1_2b[2, , ] <- spemap1_2b[2, , ] + spemap1_2b[1, , ]
     spemap1_2b[1, , ] <- 0
     spemap1_2b[dim(spemap1_2b)[1] - 1, , ] <- spemap1_2b[dim(spemap1_2b)[1] - 1, , ] + spemap1_2b[dim(spemap1_2b)[1], , ]
@@ -292,14 +317,14 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
         for (k in 1:(z_dim))
         {
           if (is.na(eggmap1_2a[i, j, k]) == FALSE) {
-            dispdata <- dispersal5_diff(x = eggmap1_2a, i = i, j = j, k = k, dx = dx, dy = dy, dz = dz, dt = dt, D_L = D_L, D_T = D_T, D_Z = D_Z, shear_surf = shear_surf, long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, buoyant = TRUE)
+            dispdata <- dispersal5_diff(x = eggmap1_2a, i = i, j = j, k = k, dx = dx, dy = dy, dz = dz, dt = dt, D_L = D_L, D_T = D_T, D_Z = D_Z, long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, buoyant = TRUE)
             eggmap1_2b[i, j, k] <- eggmap1_2a[i, j, k] + dispdata
           }
         }
       }
     }
 
-    ## no-flux boundary condition for i = 1
+    ## no-flux boundary conditions adjustments
     eggmap1_2b[2, , ] <- eggmap1_2b[2, , ] + eggmap1_2b[1, , ]
     eggmap1_2b[1, , ] <- 0
     eggmap1_2b[dim(eggmap1_2b)[1] - 1, , ] <- eggmap1_2b[dim(eggmap1_2b)[1] - 1, , ] + eggmap1_2b[dim(eggmap1_2b)[1], , ]
@@ -320,7 +345,7 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
       eggmap_temp1_2[[time]] <- eggmap1_2b
     }
 
-    ## 1_3 ascent bund####
+    ## 1_3 ascent bundle####
 
     ## ascent water column sperm bundles at various time points (1_3)
     spemap1_3 <- blank_spemap
@@ -455,7 +480,8 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
         for (k in 1:(z_dim))
         {
           if (is.na(spemap3_2a[i, j, k]) == FALSE) {
-            dispdata <- dispersal5_diff(x = spemap3_2a, i = i, j = j, k = k, dx = dx, dy = dy, dz = dz, dt = dt, D_L = D_L, D_T = D_T, D_Z = D_Z, shear_surf = shear_surf, long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, buoyant = FALSE)
+            dispdata <- dispersal5_diff(x = spemap3_2a, i = i, j = j, k = k, dx = dx, dy = dy, dz = dz, dt = dt, D_L = D_L, D_T = D_T, D_Z = D_Z,
+                                        long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, buoyant = FALSE)
             spemap3_2b[i, j, k] <- spemap3_2a[i, j, k] + dispdata
           }
         }
@@ -516,7 +542,8 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
         for (k in 1:(z_dim))
         {
           if (is.na(eggmap3_2a[i, j, k]) == FALSE) {
-            dispdata <- dispersal5_diff(x = eggmap3_2a, i = i, j = j, k = k, dx = dx, dy = dy, dz = dz, dt = dt, D_L = D_L, D_T = D_T, D_Z = D_Z, shear_surf = shear_surf, long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, buoyant = TRUE)
+            dispdata <- dispersal5_diff(x = eggmap3_2a, i = i, j = j, k = k, dx = dx, dy = dy, dz = dz, dt = dt, D_L = D_L, D_T = D_T, D_Z = D_Z,
+                                        long_dim = long_dim, trans_dim = trans_dim, z_dim = z_dim, buoyant = TRUE)
             eggmap3_2b[i, j, k] <- eggmap3_2a[i, j, k] + dispdata
           }
         }
@@ -558,7 +585,9 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
     } else {
       eggmap3_3[1:long_dim, 1:trans_dim, 2:(z_dim - 1)] <- eggmap3_2b[1:long_dim, 1:trans_dim, 2:(z_dim - 1)]
     }
-    spemap_temp3_3[[time]] <- spemap3_3
+    if (store_output) {
+      spemap_temp3_3[[time]] <- spemap3_3
+    }
     if (store_output) {
       eggmap_temp3_3[[time]] <- eggmap3_3
     }
@@ -578,8 +607,10 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
             {
               S0_m3 <- spemap3_3[i, j, k]
               S0 <- S0_m3 / cell_vol_uL
-              Bo <- pi * (rnorm(1, egg_rad, egg_rad_sd)^2) * rnorm(1, spe_speed, spe_speed_sd)
-              time_k <- dx
+              sigma <-  pi * (rnorm(1, egg_rad, egg_rad_sd)^2)
+              nu <-  rnorm(1, spe_speed, spe_speed_sd)
+              Bo <- sigma * nu
+              time_k <- dt
               xx <- fe * S0 / E0 * (1 - exp(-Bo * E0 * time_k))
               bb <- fe * S0 / E0 * (1 - exp(-Bo * E0 * tb))
               phi_poly <- (1 - exp(-xx) - xx * exp(-xx)) * (1 - exp(-bb))
@@ -606,6 +637,7 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
     fertcounter[time] <- fertcounter[time] + (sum(embmap[, , ], na.rm = T) / tot_eggs)
     spemap3_0 <- spemap3_3
     eggmap3_0 <- eggmap3_4
+    print(input1)
     print(c("time_s", time))
     print(c("fert_success", fertcounter[time]))
     if (debug_output) {
@@ -628,10 +660,8 @@ run_model <- function(scenario = "default", debug = F, store = F, out = "last_ru
   end_time_opt <- Sys.time()
   time_diff <- end_time_opt - strt
   time_diff
-  print(no_timestep)
   print_output_and_save_plots(int_col_spac = int_col_spac, no_timestep = no_timestep, spemap3_3 = spemap3_3, eggmap3_4 = eggmap3_4,
-                              surface = surface, spemap_temp3_3 = spemap_temp3_3, fertcounter = fertcounter, embmap_store = embmap_store,
-                              new_folder_path = new_folder_path)
+                              surface = surface, spemap_temp3_3 = spemap_temp3_3, smallmat = smallmat, fertcounter = fertcounter,
+                              embmap_store = embmap_store, tot_spe_indiv = tot_spe_indiv, new_folder_path = new_folder_path,
+                              execution_mode = "parallel", input_id = input1, input_df = input_df, time_diff = time_diff)
 }
-
-# 7 Model end - run above ---------------------------------------------------------------
