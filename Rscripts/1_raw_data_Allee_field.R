@@ -28,4 +28,4 @@ Allee_data[["intercol_dist_natural"]] <- intercol_dist_natural
 load("./Rdata/egg_conc_exp.RData") #egg_conc_exp
 Allee_data[["egg_conc_exp"]] <- egg_conc_exp 
 
-##
+###
