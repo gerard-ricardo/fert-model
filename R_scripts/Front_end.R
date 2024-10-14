@@ -15,7 +15,7 @@ source("./R_scripts/1_print_outputs.R") # Model outputs
 source("./R_scripts/Backend.R") # Model backend logic
 
 # Creating a task-specific folder inside 'out' directory to avoid overwriting results
-dir_name <- "./out/test1"  #NAME THE FOLDER
+dir_name <- "./out/test2"  #NAME THE FOLDER
 dir.create(file.path(getwd(),  dir_name), showWarnings = T)
 new_folder_path <- file.path(getwd(), dir_name)
 
@@ -37,7 +37,6 @@ new_folder_path <- file.path(getwd(), dir_name)
 # ============================================================================
 (df = data.frame(
     colony_diam = c(20),
-    patch_type = c('patch_bot'),
     depth_m = c(3),
     flow_rate = c(0.2)))
 
