@@ -22,6 +22,7 @@ ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
       class = "wide-sidebar",
+      textInput("outputFolder", "Output Folder Name:", value = "output_folder1"),
       selectInput("patch_type", "Patch Type:",
                   choices = c("2022ahyac", "2021tenuis", "2021digit", "patch_bot"), selected = "patch_bot"),
       uiOutput("interColSpaceMessage"),
@@ -60,9 +61,9 @@ ui <- fluidPage(
 
       div(class = "kinetics-parameters",
           h4("Kinetics Parameters", class = "parameter-heading"),
-          numericInput("tb", "tb:", value = 0.005138657),
-          numericInput("fe", "fe:", value = 0.002391663),
-          numericInput("E0", "E0:", value = 0.003764767),
+          numericInput("tb", "tb:", value = 0.0051),
+          numericInput("fe", "fe:", value = 0.0024),
+          numericInput("E0", "E0:", value = 0.0038),
           numericInput("spe_speed", "Spawning Speed:", value = 0.35),
           numericInput("spe_speed_sd", "Spawning Speed SD:", value = 0.049),
           numericInput("egg_dia", "Egg Diameter:", value = 0.517),
@@ -137,16 +138,21 @@ server <- function(input, output, session) {
     df()
   })
 
-  # Run model and log output
   observeEvent(input$runModel, {
     log <- ""
+
+    # Create the directory for the output
+    dir_name <- paste0("./out/", input$outputFolder)
+    if (!dir.exists(dir_name)) {
+      dir.create(dir_name, recursive = TRUE, showWarnings = TRUE)
+    }
+    print(paste("Output folder created or exists at:", dir_name))
+
     for (i in 1:nrow(df())) {
       input1 <- paste(as.character(unname(df()[i,])), collapse = "_")
       input_df <- df()[i,]
 
-      # Simulated run_model function (replace with your actual function)
-      log <- paste0(log, "Running model with settings: ", toString(input_df), "\n")
-
+      # Run the model without output_dir
       run_model(
         scenario = "test",
         store = TRUE,
@@ -168,7 +174,14 @@ server <- function(input, output, session) {
         polyp_den = df()[i, 'polyp_den'],
         egg_dia = df()[i, 'egg_dia']
       )
+
+      # Save outputs manually to output_dir
+      output_dir <- file.path(getwd(), dir_name)
+      saveRDS(input_df, file = file.path(output_dir, paste0("run_", input1, ".rds")))  # Example of saving input settings
+      log <- paste0(log, "Model run completed. Outputs saved in: ", output_dir, "\n")
     }
+
+    # Display the log
     output$modelLog <- renderText(log)
   })
 }
