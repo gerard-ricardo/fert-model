@@ -15,7 +15,7 @@ source("./R_scripts/1_print_outputs.R") # Model outputs
 source("./R_scripts/Backend.R") # Model backend logic
 
 # Creating a task-specific folder inside 'out' directory to avoid overwriting results
-dir_name <- "./out/test2"  #NAME THE FOLDER
+dir_name <- "./out/test3"  #NAME THE FOLDER
 dir.create(file.path(getwd(),  dir_name), showWarnings = T)
 new_folder_path <- file.path(getwd(), dir_name)
 
@@ -54,7 +54,7 @@ for(i in 1:nrow(df)) {
             depth_m = df[i, 'depth_m'], flow_rate = df[i, 'flow_rate'], no_height = df[i, 'no_height'], no_width = df[i, 'no_height'],
             tb = df[i, 'tb'], fe = df[i, 'fe'], E0 = df[i, 'E0'], patch_density  = df[i, 'patch_density'], spe_speed  = df[i, 'spe_speed'],
             long_const  = df[i, 'long_const'], bundlebreak = df[i, 'bundlebreak'], bundlebreak_sd = df[i, 'bundlebreak_sd'],
-            polyp_den = df[i, 'polyp_den'], egg_dia = df[i, 'egg_dia'])  # Choose 'default', 'test', or 'custom'.
+            polyp_den = df[i, 'polyp_den'], egg_dia = df[i, 'egg_dia'])  # Choose 'default', or 'test'.
 }
 
 # ============================================================================
