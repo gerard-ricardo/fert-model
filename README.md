@@ -29,7 +29,7 @@ Users can select from predefined scenarios or customize settings manually or via
 
    ```r
    # Available options: 'default', or 'test'.
-    run_model(scenario = "test")
+    run_model(scenario = "test",...)
    
    ```
 6. **Run** the whole code.
@@ -49,7 +49,8 @@ Users can select from predefined scenarios or customize settings manually or via
 
 ## Note
 
-This is a 'cleaned script' with reduced functionality. 
+ - This is a 'cleaned script' with reduced functionality. 
+ - Typical run times are ~2.5 minutes fora test
 
 
 

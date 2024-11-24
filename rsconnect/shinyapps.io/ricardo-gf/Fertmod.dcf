@@ -1,0 +1,13 @@
+name: Fertmod
+title: Fertmod
+username: ricardo-gf
+account: ricardo-gf
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 13434882
+bundleId: 9408058
+url: https://ricardo-gf.shinyapps.io/Fertmod/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: out|scratch
