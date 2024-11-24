@@ -34,7 +34,7 @@ Users can select from predefined scenarios or customize settings manually or via
    ```
 6. **Run** the whole code.
 
-7. **Outputs** will be in the 'out' folder
+7. **Outputs** Fertilisation success for each time step will be shown in the console. Further outputs and plots will be in the 'out' folder
 
 ### Running the Model via the Shiny-app frontend
 
@@ -46,11 +46,13 @@ Users can select from predefined scenarios or customize settings manually or via
 
 4. **Run model**
 
+5. **Outputs** Fertilisation success for each time step will be shown in the console. Input setting will be saved as a .rds file in the 'out' folder. No plots will be saved using the shiny-app.
+
 
 ## Note
 
  - This is a 'cleaned script' with reduced functionality. 
- - Typical run times are ~2.5 minutes fora test
+ - Typical run times are ~2.5 minutes for a test run, and 3-5 hours for a default run. 
 
 
 
