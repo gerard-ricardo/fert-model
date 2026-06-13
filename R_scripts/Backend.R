@@ -339,7 +339,7 @@ run_model <- function(scenario = "test", debug = F, store = F, input1 = input1, 
     eggmap1_2b[, , dim(eggmap1_2b)[3]] <- 0
 
     ## Conservation of mass correction
-    eggmap1_2b <- eggmap1_2b * (sum(spemap1_1, na.rm = TRUE) / sum(eggmap1_2b, na.rm = TRUE))
+    eggmap1_2b <- eggmap1_2b * (sum(eggmap1_1, na.rm = TRUE) / sum(eggmap1_2b, na.rm = TRUE))
     if (store_output) {
       eggmap_temp1_1[[time]] <- eggmap1_1
       eggmap_temp1_2[[time]] <- eggmap1_2b
