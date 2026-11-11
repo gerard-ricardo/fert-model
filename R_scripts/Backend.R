@@ -173,7 +173,7 @@ run_model <- function(scenario = "test", debug = F, store = F, input1 = input1, 
 
   ## Sperm sinking
   sperm_sink_cm_h <- 60
-  sperm_sink_m_h <- sperm_sink_cm_h / 10
+  sperm_sink_m_h <- sperm_sink_cm_h / 100
   sperm_sink_m_s <- sperm_sink_m_h / 3600
 
   ## Diffusion coefs
